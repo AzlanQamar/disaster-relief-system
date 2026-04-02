@@ -1,12 +1,17 @@
 package edu.ucalgary.oop;
+
 import java.time.LocalDate;
+
 /**
- * The MedicalRecord class represents a medical record for a disaster victim.
- * It contains information about the location of treatment, details of the treatment, and the date of treatment.
+ * The MedicalRecord class represents a medical record for a disaster victim. It
+ * contains information about the location of treatment, details of the
+ * treatment, and the date of treatment.
  */
 
 public class MedicalRecord {
+
     private int id;
+    private DisasterVictim victim;
     private Location location;
     private String treatmentDetails;
     private LocalDate treatmentDate;
@@ -36,6 +41,17 @@ public class MedicalRecord {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public DisasterVictim getVictim() {
+        return victim;
+    }
+
+    public void setVictim(DisasterVictim victim) {
+        if (victim == null) {
+            throw new IllegalArgumentException("Victim cannot be null");
+        }
+        this.victim = victim;
     }
 
     public Location getLocation() {
