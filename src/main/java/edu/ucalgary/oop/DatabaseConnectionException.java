@@ -1,15 +1,22 @@
 package edu.ucalgary.oop;
 
 /**
- * The DatabaseConnectionException is a custom exception that is thrown when
- * there is an issue connecting to the database. This exception can be used to
- * handle errors related to database connectivity, such as incorrect
- * credentials, network issues, or database server downtime.
+ * Thrown when a connection to the PostgreSQL database cannot be established.
+ * This may occur due to incorrect credentials, network issues, or the database
+ * server being unavailable.
+ *
+ * @author Azlan
+ * @version 1.0
+ * @since 2026-03-01
  */
 public class DatabaseConnectionException extends Exception {
 
+    /**
+     * Constructs a DatabaseConnectionException with the specified message.
+     *
+     * @param message a description of the connection failure
+     */
     public DatabaseConnectionException(String message) {
         super(message);
     }
-
 }

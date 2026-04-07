@@ -7,17 +7,26 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * The DatabaseConnectionManager class is responsible for managing the database
- * connection using the singleton design pattern. It reads the database
- * configuration from a properties file and provides methods to get the
- * connection and close it when done. It also handles exceptions related to
- * database connections by throwing a custom DatabaseConnectionException.
+ * Manages the PostgreSQL database connection using the Singleton pattern. Reads
+ * credentials from src/main/resources/config.txt and provides a single shared
+ * connection throughout the application.
+ *
+ * @author Azlan
+ * @version 1.0
+ * @since 2026-03-01
  */
 public class DatabaseConnectionManager {
 
     private static DatabaseConnectionManager instance = null;
     private Connection connection;
 
+    /**
+     * Private constructor that reads database credentials from config.txt and
+     * opens a connection to the PostgreSQL database.
+     *
+     * @throws DatabaseConnectionException if the connection cannot be
+     * established
+     */
     private DatabaseConnectionManager() throws DatabaseConnectionException {
         try {
             Properties props = new Properties();
@@ -31,6 +40,13 @@ public class DatabaseConnectionManager {
         }
     }
 
+    /**
+     * Returns the single instance of DatabaseConnectionManager, creating it if
+     * it does not yet exist.
+     *
+     * @return the shared DatabaseConnectionManager instance
+     * @throws DatabaseConnectionException if the database connection fails
+     */
     public static DatabaseConnectionManager getInstance() throws DatabaseConnectionException {
         if (instance == null) {
             instance = new DatabaseConnectionManager();
@@ -38,10 +54,20 @@ public class DatabaseConnectionManager {
         return instance;
     }
 
+    /**
+     * Returns the active database connection.
+     *
+     * @return the PostgreSQL Connection object
+     */
     public Connection getConnection() {
         return connection;
     }
 
+    /**
+     * Closes the database connection if it is open.
+     *
+     * @throws DatabaseConnectionException if the connection cannot be closed
+     */
     public void close() throws DatabaseConnectionException {
         try {
             if (connection != null) {
@@ -50,7 +76,5 @@ public class DatabaseConnectionManager {
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Failed to close connection: " + e.getMessage());
         }
-
     }
-
 }
