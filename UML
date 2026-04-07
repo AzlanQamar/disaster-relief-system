@@ -56,7 +56,7 @@ together {
         + setGender(gender : String) : void throws IllegalArgumentException
         + getLocation() : Location
         + setLocation(location : Location) : void
-        + getIsSoftDeleted() : boolean
+        + isSoftDeleted() : boolean
         + softDelete() : void
         + getMedicalRecords() : ArrayList<MedicalRecord>
         + addMedicalRecord(record : MedicalRecord) : void throws IllegalArgumentException
@@ -78,7 +78,7 @@ together {
         - {final} INFO : String
         - {final} SERVICES_PHONE : String
         --
-        + Inquirer(firstName : String, lastName : String, phone : String, info : String)
+        + Inquirer(firstName : String, lastName : String, info : String, phone : String)
         + getServicesPhoneNum() : String
         + getInfo() : String
     }
@@ -136,18 +136,18 @@ together {
     class FamilyRelation {
         - id : int
         - personOne : Person
-        - relationshipTo : String
         - personTwo : Person
+        - relationshipTo : String
         --
-        + FamilyRelation(personOne : Person, relationshipTo : String, personTwo : Person) throws IllegalArgumentException
+        + FamilyRelation(personOne : Person, personTwo : Person, relationshipTo : String) throws IllegalArgumentException
         + getId() : int
         + setId(id : int) : void
         + getPersonOne() : Person
         + setPersonOne(person : Person) : void throws IllegalArgumentException
-        + getRelationshipTo() : String
-        + setRelationshipTo(relationship : String) : void
         + getPersonTwo() : Person
         + setPersonTwo(person : Person) : void throws IllegalArgumentException
+        + getRelationshipTo() : String
+        + setRelationshipTo(relationship : String) : void
     }
 
     class Inquiry {
@@ -203,7 +203,7 @@ together {
         + setAllocationDate(date : LocalDate) : void
         + getDescription() : String
         + setDescription(description : String) : void
-        + allocateTo(victim : DisasterVictim, date : LocalDate) : void
+        + allocateToVictim(victim : DisasterVictim, date : LocalDate) : void
         + isAllocated() : boolean
     }
 
@@ -348,7 +348,7 @@ together {
     class DatabaseConnectionManager {
         - {static} instance : DatabaseConnectionManager = null
         - connection : Connection
-        - {final} CONFIG_FILE : String = "src/main/resources/config.txt"
+        - {final} LOG_FILE : String = "src/main/resources/config.txt"
         --
         - DatabaseConnectionManager()
         + {static} getInstance() : DatabaseConnectionManager throws DatabaseConnectionException
@@ -387,8 +387,11 @@ together {
         - db : DatabaseInterface
         - victims : ArrayList<DisasterVictim>
         - locations : ArrayList<Location>
-        - availableRequirements : HashMap<String, ArrayList<String>>
+        - inquiries : ArrayList<Inquiry>
+        - medicalRecords : ArrayList<MedicalRecord>
+        - availableRequirements : HashMap<String, Set<String>>
         - view : ConsoleView
+        - logger : ActionLogger
         --
         + ApplicationController(db : DatabaseInterface, view : ConsoleView)
         + run() : void
@@ -411,13 +414,13 @@ together {
         + ConsoleView()
         + displayMainMenu() : int
         + displayVictims(victims : ArrayList<DisasterVictim>) : void
+        + displayExpiredSupplies(supplies : ArrayList<Supply>) : void
         + promptConfirmation(message : String) : boolean
         + promptDeletionMode() : String
-        + displayExpiredSupplies(supplies : ArrayList<Supply>) : void
+        + promptString(prompt : String) : String
+        + promptInt(prompt : String, min : int, max : int) : int
         + displayError(message : String) : void
         + displaySuccess(message : String) : void
-        + promptInt(prompt : String, min : int, max : int) : int
-        + promptString(prompt : String) : String
     }
 }
 
