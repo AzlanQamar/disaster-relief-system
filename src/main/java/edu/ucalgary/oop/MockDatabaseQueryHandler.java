@@ -46,8 +46,20 @@ public class MockDatabaseQueryHandler implements DatabaseInterface {
      * @return the list of DisasterVictim objects
      */
     @Override
-    public ArrayList<DisasterVictim> loadAllVictims() {
+    public ArrayList<DisasterVictim> loadAllVictims(ArrayList<Location> locations) {
         return victims;
+    }
+
+    /**
+     * Returns all inquiries in the mock database. Currently returns an empty
+     * list.
+     *
+     * @param victims the list of loaded victims to match against subject IDs
+     * @return the list of Inquiry objects
+     */
+    @Override
+    public ArrayList<Inquiry> loadAllInquiries(ArrayList<DisasterVictim> victims) {
+        return new ArrayList<>();
     }
 
     /**

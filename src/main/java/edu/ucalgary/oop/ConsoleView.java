@@ -33,14 +33,13 @@ public class ConsoleView {
         System.out.println("1. Manage Victims");
         System.out.println("2. Manage Supplies");
         System.out.println("3. Manage Inquiries");
-        System.out.println("4. Manage Medical Records");
-        System.out.println("5. Manage Family Relations");
-        System.out.println("6. Manage Cultural Requirements");
-        System.out.println("7. Manage Skills");
-        System.out.println("8. Exit");
-        System.out.print("Enter choice: ");
-        int value = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("4. Manage Locations");
+        System.out.println("5. Manage Medical Records");
+        System.out.println("6. Manage Family Relations");
+        System.out.println("7. Manage Cultural Requirements");
+        System.out.println("8. Manage Skills");
+        System.out.println("9. Exit");
+        int value = promptInt("Enter choice", 1, 9);
         return value;
     }
 
@@ -52,8 +51,11 @@ public class ConsoleView {
     public void displayVictims(ArrayList<DisasterVictim> victims) {
         System.out.println("=== Disaster Victims ===");
         for (DisasterVictim victim : victims) {
+            String age = victim.getDateOfBirth() != null
+                    ? "DOB: " + victim.getDateOfBirth()
+                    : victim.getApproximateAge() != null ? "Age: ~" + victim.getApproximateAge() : "Age: N/A";
             System.out.println("ID: " + victim.getId() + " - Name: " + victim.getFirstName()
-                    + " " + victim.getLastName() + " - Location: " + victim.getLocation());
+                    + " " + victim.getLastName() + " | " + age);
         }
     }
 
@@ -80,10 +82,17 @@ public class ConsoleView {
      * @return true if the user answered yes, false otherwise
      */
     public boolean promptConfirmation(String message) {
-        System.out.print(message + " (y/n): ");
-        String input = scanner.next();
-        scanner.nextLine();
-        return input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes");
+        while (true) {
+            System.out.print(message + " (y/n): ");
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) {
+                return true;
+            }
+            if (input.equalsIgnoreCase("n") || input.equalsIgnoreCase("no")) {
+                return false;
+            }
+            System.out.println("Please enter y or n.");
+        }
     }
 
     /**
@@ -119,17 +128,19 @@ public class ConsoleView {
      * @return a valid integer entered by the user within [min, max]
      */
     public int promptInt(String prompt, int min, int max) {
-        int value;
         while (true) {
             System.out.print(prompt + " (" + min + "-" + max + "): ");
-            value = scanner.nextInt();
-            scanner.nextLine();
-            if (value >= min && value <= max) {
-                break;
+            String input = scanner.nextLine().trim();
+            try {
+                int value = Integer.parseInt(input);
+                if (value >= min && value <= max) {
+                    return value;
+                }
+                System.out.println("Please enter a number between " + min + " and " + max + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
             }
-            System.out.println("Invalid input. Please enter a number between " + min + " and " + max + ".");
         }
-        return value;
     }
 
     /**
@@ -164,7 +175,7 @@ public class ConsoleView {
             try {
                 return LocalDate.parse(input);
             } catch (Exception e) {
-                System.out.println("Invalid date format. Please use YYYY-MM-DD (e.g. 1994-10-10).");
+                System.out.println("\"Invalid date format. Please use YYYY-MM-DD with zero-padded month and day (e.g. 2028-09-10).\");.");
             }
         }
     }

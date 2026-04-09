@@ -38,8 +38,12 @@ public class ApplicationController {
         this.db = db;
         this.view = view;
         this.logger = ActionLogger.getInstance();
-        this.victims = db.loadAllVictims();
         this.locations = db.loadAllLocations();
+        this.victims = db.loadAllVictims(locations);
+        this.inquiries = db.loadAllInquiries(victims);
+        for (DisasterVictim v : victims) {
+            medicalRecords.addAll(v.getMedicalRecords());
+        }
         loadAvailableRequirements();
     }
 
@@ -50,8 +54,15 @@ public class ApplicationController {
     public void run() {
         checkExpiredSupplies();
         boolean running = true;
+        Integer choice = null;
         while (running) {
-            int choice = view.displayMainMenu();
+            try {
+                choice = view.displayMainMenu();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+                System.out.println("Please Enter Correct Selection");
+                choice = 1994;
+            }
             switch (choice) {
                 case 1:
                     manageVictims();
@@ -63,18 +74,21 @@ public class ApplicationController {
                     manageInquiries();
                     break;
                 case 4:
-                    manageMedicalRecords();
+                    manageLocations();
                     break;
                 case 5:
-                    manageFamilyRelations();
+                    manageMedicalRecords();
                     break;
                 case 6:
-                    manageCulturalRequirements();
+                    manageFamilyRelations();
                     break;
                 case 7:
-                    manageSkills();
+                    manageCulturalRequirements();
                     break;
                 case 8:
+                    manageSkills();
+                    break;
+                case 9:
                     running = false;
                     break;
                 default:
@@ -112,6 +126,7 @@ public class ApplicationController {
                     return;
                 default:
                     view.displayError("Invalid choice");
+                    return;
             }
         }
     }
@@ -283,11 +298,26 @@ public class ApplicationController {
      * location in the system and database.
      */
     public void addSupply() {
-        String type = view.promptString("Enter supply type");
+        String type = "";
+        while (type.trim().isEmpty()) {
+            type = view.promptString("Enter supply type");
+            if (type.trim().isEmpty()) {
+                view.displayError("Supply type cannot be empty.");
+            }
+        }
         Supply supply;
         if (view.promptConfirmation("Is it perishable?")) {
-            LocalDate expiry = view.promptDate("Enter expiry date (YYYY-MM-DD)");
+            LocalDate expiry;
+            while (true) {
+                expiry = view.promptDate("Enter expiry date");
+                if (expiry.isBefore(LocalDate.now())) {
+                    view.displayError("Expiry date cannot be in the past. Supply would already be expired.");
+                } else {
+                    break;
+                }
+            }
             supply = new PerishableSupply(type, expiry);
+
         } else {
             supply = new Supply(type);
         }
@@ -363,9 +393,10 @@ public class ApplicationController {
         }
         for (Inquiry inquiry : inquiries) {
             System.out.println("ID: " + inquiry.getId()
-                    + " | Inquirer: " + inquiry.getInquirer().getFirstName()
-                    + " | Subject: " + inquiry.getSubjectPerson().getFirstName()
-                    + " | Date: " + inquiry.getInquiryDate());
+                    + " | Inquirer: " + inquiry.getInquirer().getFirstName() + " " + inquiry.getInquirer().getLastName()
+                    + " | Subject: " + inquiry.getSubjectPerson().getFirstName() + " " + inquiry.getSubjectPerson().getLastName()
+                    + " | Details: " + inquiry.getDetails()
+                    + " | Date: " + inquiry.getInquiryDate().toLocalDate());
         }
     }
 
@@ -395,6 +426,88 @@ public class ApplicationController {
         } catch (IllegalArgumentException e) {
             view.displayError(e.getMessage());
         }
+    }
+
+    /**
+     * Displays the location management sub-menu and handles location
+     * operations.
+     */
+    public void manageLocations() {
+        while (true) {
+            System.out.println("\n=== Manage Locations ===");
+            System.out.println("1. View all locations");
+            System.out.println("2. View victims at a location");
+            System.out.println("3. Back");
+            int choice = view.promptInt("Enter choice", 1, 3);
+            switch (choice) {
+                case 1:
+                    viewLocations();
+                    break;
+                case 2:
+                    viewVictimsByLocation();
+                    break;
+                case 3:
+                    return;
+                default:
+                    view.displayError("Invalid choice");
+            }
+        }
+    }
+
+    /**
+     * Displays all locations with their address and occupant count.
+     */
+    private void viewLocations() {
+        if (locations.isEmpty()) {
+            System.out.println("No locations found.");
+            return;
+        }
+        for (Location location : locations) {
+            System.out.println("ID: " + location.getId()
+                    + " | " + location.getName()
+                    + " | " + location.getAddress()
+                    + " | Victims: " + countVictimsAtLocation(location));
+        }
+    }
+
+    /**
+     * Prompts the user to select a location and displays all victims there.
+     */
+    private void viewVictimsByLocation() {
+        showLocations();
+        Location location = locations.get(view.promptInt("Choose location", 1, locations.size()) - 1);
+        boolean found = false;
+        for (DisasterVictim victim : victims) {
+            if (victim.getLocation() != null && victim.getLocation().getId() == location.getId()) {
+                String age = victim.getDateOfBirth() != null
+                        ? "DOB: " + victim.getDateOfBirth()
+                        : victim.getApproximateAge() != null ? "Age: ~" + victim.getApproximateAge() : "Age: N/A";
+                System.out.println("  ID: " + victim.getId()
+                        + " | " + victim.getFirstName() + " " + victim.getLastName()
+                        + " | " + age
+                        + " | Gender: " + (victim.getGender() != null ? victim.getGender() : "N/A"));
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No victims at " + location.getName() + ".");
+        }
+    }
+
+    /**
+     * Counts how many victims are currently assigned to a location.
+     *
+     * @param location the location to count victims for
+     * @return the number of victims at that location
+     */
+    private int countVictimsAtLocation(Location location) {
+        int count = 0;
+        for (DisasterVictim v : victims) {
+            if (v.getLocation() != null && v.getLocation().getId() == location.getId()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -468,23 +581,55 @@ public class ApplicationController {
     }
 
     /**
-     * Displays the family relation management sub-menu and handles family
-     * relation operations.
+     * Displays the inquiry management sub-menu and handles inquiry operations.
      */
     public void manageFamilyRelations() {
         while (true) {
             System.out.println("\n=== Manage Family Relations ===");
-            System.out.println("1. Add family relation");
-            System.out.println("2. Back");
-            int choice = view.promptInt("Enter choice", 1, 2);
+            System.out.println("1. View family relations for a victim");
+            System.out.println("2. Add family relation");
+            System.out.println("3. Back");
+            int choice = view.promptInt("Enter choice", 1, 3);
             switch (choice) {
                 case 1:
-                    addFamilyRelation();
+                    viewFamilyRelations();
                     break;
                 case 2:
+                    addFamilyRelation();
+                    break;
+                case 3:
                     return;
                 default:
                     view.displayError("Invalid choice");
+            }
+        }
+    }
+
+    /**
+     * Displays all family relations for a selected victim.
+     */
+    private void viewFamilyRelations() {
+        view.displayVictims(victims);
+        DisasterVictim victim = findVictimById(view.promptInt("Enter victim ID", 1, Integer.MAX_VALUE));
+        if (victim == null) {
+            view.displayError("Victim not found");
+            return;
+        }
+        if (victim.getFamilyConnections().isEmpty()) {
+            System.out.println("No family relations for this victim.");
+            return;
+        }
+        for (FamilyRelation rel : victim.getFamilyConnections()) {
+            if (rel.getPersonOne().getId() == victim.getId()) {
+                System.out.println("ID: " + rel.getId()
+                        + " | " + rel.getPersonOne().getFirstName() + " " + rel.getPersonOne().getLastName()
+                        + " is " + rel.getRelationshipTo()
+                        + " of " + rel.getPersonTwo().getFirstName() + " " + rel.getPersonTwo().getLastName());
+            } else {
+                System.out.println("ID: " + rel.getId()
+                        + " | " + rel.getPersonTwo().getFirstName() + " " + rel.getPersonTwo().getLastName()
+                        + " is related to " + rel.getPersonOne().getFirstName() + " " + rel.getPersonOne().getLastName()
+                        + " (" + rel.getRelationshipTo() + ")");
             }
         }
     }

@@ -18,7 +18,7 @@ public interface DatabaseInterface {
      *
      * @return a list of all active DisasterVictim objects
      */
-    ArrayList<DisasterVictim> loadAllVictims();
+    ArrayList<DisasterVictim> loadAllVictims(ArrayList<Location> locations);
 
     /**
      * Loads all locations from the database.
@@ -26,6 +26,15 @@ public interface DatabaseInterface {
      * @return a list of all Location objects
      */
     ArrayList<Location> loadAllLocations();
+
+    /**
+     * Loads all inquiries from the database and associates them with their
+     * subject victims.
+     *
+     * @param victims the list of loaded victims to match against subject IDs
+     * @return a list of all Inquiry objects
+     */
+    ArrayList<Inquiry> loadAllInquiries(ArrayList<DisasterVictim> victims);
 
     /**
      * Saves a new disaster victim to the database and sets their generated ID.

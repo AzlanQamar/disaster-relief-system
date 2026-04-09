@@ -1,0 +1,1 @@
+[2026-04-09T09:34:57.135981254] ERROR: Failed to connect to database | Exception: edu.ucalgary.oop.DatabaseConnectionException | Message: Failed to connect: Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.
