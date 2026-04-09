@@ -1,4 +1,4 @@
-# disaster-relief-system# Disaster Relief System
+# Disaster Relief System
 
 A Java-based disaster relief management system that allows relief workers to manage disaster victims, supplies, medical records, family relations, cultural requirements, and skills. Built with Java 21, JDBC, and PostgreSQL.
 
@@ -29,9 +29,11 @@ psql -U postgres -h localhost -f IA2_instructions/project.sql
 
 Database credentials are stored in `src/main/resources/config.txt`:
 
+```
 url=jdbc:postgresql://localhost/ensf380project
 user=oop
 password=ucalgary
+```
 
 ## Compiling
 
@@ -55,18 +57,21 @@ java -cp out:lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar org.junit.runner.JUn
 
 ## Project Structure
 
-disaster-relief/
-├── data/ # Runtime log files (generated automatically)
-├── lib/ # JAR dependencies
-├── src/main/java/edu/ucalgary/oop/ # Source files
-├── src/main/resources/ # config.txt and .ser files
-├── test/edu/ucalgary/oop/ # Unit tests
-└── IA2_DisasterRelief.pdf # UML diagram
+```
+30241636/
+├── data/                              # Runtime log files (generated automatically)
+├── lib/                               # JAR dependencies
+├── src/main/java/edu/ucalgary/oop/   # Source files
+├── src/main/resources/                # config.txt and .ser files
+├── src/main/java/edu/ucalgary/oop/   # Unit tests (same folder as source)
+└── IA2_DisasterRelief.pdf             # UML diagram
+```
 
 ## Features
 
 - Manage disaster victims (add, update, soft/hard delete)
 - Manage supplies and allocate to victims
+- View victims by location
 - Log inquiries from family members
 - Record medical treatments
 - Track family relationships
