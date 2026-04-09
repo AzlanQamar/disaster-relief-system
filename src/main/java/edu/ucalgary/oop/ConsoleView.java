@@ -1,5 +1,6 @@
 package edu.ucalgary.oop;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -147,5 +148,24 @@ public class ConsoleView {
      */
     public void displaySuccess(String message) {
         System.out.println("SUCCESS: " + message);
+    }
+
+    /**
+     * Prompts the user for a date in YYYY-MM-DD format, re-prompting on invalid
+     * input.
+     *
+     * @param prompt the message to display
+     * @return a valid LocalDate entered by the user
+     */
+    public LocalDate promptDate(String prompt) {
+        while (true) {
+            System.out.print(prompt + " (YYYY-MM-DD): ");
+            String input = scanner.nextLine();
+            try {
+                return LocalDate.parse(input);
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD (e.g. 1994-10-10).");
+            }
+        }
     }
 }

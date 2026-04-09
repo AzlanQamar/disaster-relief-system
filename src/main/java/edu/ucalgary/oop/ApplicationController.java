@@ -127,7 +127,7 @@ public class ApplicationController {
             DisasterVictim victim = new DisasterVictim(firstName, LocalDate.now());
             victim.setLastName(lastName);
             if (view.promptConfirmation("Do you know the exact date of birth?")) {
-                victim.setDateOfBirth(LocalDate.parse(view.promptString("Enter date of birth (YYYY-MM-DD)")));
+                victim.setDateOfBirth(view.promptDate("Enter date of birth"));
             } else {
                 victim.setApproximateAge(view.promptInt("Enter approximate age", 0, 150));
             }
@@ -177,7 +177,7 @@ public class ApplicationController {
                         if (victim.getDateOfBirth() != null) {
                             view.displayError("Cannot replace birthdate with approximate age");
                         } else if (view.promptConfirmation("Enter exact date of birth?")) {
-                            victim.setDateOfBirth(LocalDate.parse(view.promptString("Enter date (YYYY-MM-DD)")));
+                            victim.setDateOfBirth(view.promptDate("Enter date (YYYY-MM-DD)"));
                         } else {
                             victim.setApproximateAge(view.promptInt("Enter approximate age", 0, 150));
                         }
@@ -286,7 +286,7 @@ public class ApplicationController {
         String type = view.promptString("Enter supply type");
         Supply supply;
         if (view.promptConfirmation("Is it perishable?")) {
-            LocalDate expiry = LocalDate.parse(view.promptString("Enter expiry date (YYYY-MM-DD)"));
+            LocalDate expiry = view.promptDate("Enter expiry date (YYYY-MM-DD)");
             supply = new PerishableSupply(type, expiry);
         } else {
             supply = new Supply(type);
@@ -451,7 +451,7 @@ public class ApplicationController {
             return;
         }
         String details = view.promptString("Enter treatment details");
-        LocalDate date = LocalDate.parse(view.promptString("Enter treatment date (YYYY-MM-DD)"));
+        LocalDate date = view.promptDate("Enter treatment date (YYYY-MM-DD)");
         showLocations();
         Location location = locations.get(view.promptInt("Choose location", 1, locations.size()) - 1);
         try {
@@ -705,7 +705,7 @@ public class ApplicationController {
             VictimSkill vs;
             if (catChoice == 1) {
                 String certType = view.promptString("Enter certification type (first-aid/counseling/nursing/doctor)");
-                LocalDate certExpiry = LocalDate.parse(view.promptString("Enter certification expiry (YYYY-MM-DD)"));
+                LocalDate certExpiry = view.promptDate("Enter certification expiry (YYYY-MM-DD)");
                 vs = new MedicalSkill(skill, proficiency, certType, certExpiry);
             } else if (catChoice == 2) {
                 boolean readWrite = view.promptConfirmation("Can read/write?");
