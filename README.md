@@ -58,7 +58,7 @@ java -cp out:lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar org.junit.runner.JUn
 ## Project Structure
 
 ```
-30241636/
+disaster-relief-system/
 ├── data/                              # Runtime log files (generated automatically)
 ├── lib/                               # JAR dependencies
 ├── src/main/java/edu/ucalgary/oop/   # Source files
